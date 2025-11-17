@@ -23,4 +23,11 @@ public class ProductRepository(AppDbContext context) : IProductRepository
         context.SaveChanges();
         return product;
     }
+
+    public Product UpdateProduct(Product product)
+    {
+        context.Products.Update(product);
+        context.SaveChanges();
+        return product;
+    }
 }

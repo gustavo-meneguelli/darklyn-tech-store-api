@@ -1,3 +1,4 @@
+using Application.DTO;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,10 +29,23 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddProduct(string productName, int productPrice)
+    public IActionResult AddProduct(CreateProductDto dto)
     {
-        var  serviceResult = service.AddProduct(productName, productPrice);
+        var  serviceResult = service.AddProduct(dto);
         
         return CreatedAtAction(nameof(GetProductById), new { id = serviceResult.Id }, serviceResult);
+    }
+
+    [HttpPatch("{id}")]
+    public IActionResult UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+    {
+        var serviceResult = service.UpdateProduct(id, dto);
+
+        if (serviceResult is null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(serviceResult);
     }
 }
