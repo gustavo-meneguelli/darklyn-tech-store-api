@@ -7,25 +7,25 @@ namespace Application.Services;
 
 public class ProductService(IProductRepository repository) : IProductService
 {
-    public Result<IEnumerable<Product>> GetAll()
+    public async Task<Result<IEnumerable<Product>>> GetAll()
     {
-        var products = repository.GetProducts();
+        var products = await repository.GetProducts();
         
         return Result<IEnumerable<Product>>.Success(products);
     }
 
-    public Result<Product?> GetById(int id)
+    public async Task<Result<Product?>> GetById(int id)
     {
-        var product = repository.GetProduct(id);
+        var product = await repository.GetProduct(id);
 
         return product is null
             ? Result<Product?>.NotFound("No product were found with this ID.")
             : Result<Product?>.Success(product);
     }
 
-    public Result<Product> AddProduct(CreateProductDto dto)
+    public async Task<Result<Product>> AddProduct(CreateProductDto dto)
     {
-        bool productExists = repository.GetProductByName(dto.Name) is not null;
+        bool productExists = await repository.GetProductByName(dto.Name) is not null;
 
         if (productExists)
         {
@@ -33,20 +33,20 @@ public class ProductService(IProductRepository repository) : IProductService
         }
         
         var product = new Product { Name = dto.Name, Price = dto.Price };
-        repository.AddProduct(product);
+        await repository.AddProduct(product);
         return Result<Product>.Created(product);
     }
 
-    public Result<Product?> UpdateProduct(int id, UpdateProductDto dto)
+    public async Task<Result<Product?>> UpdateProduct(int id, UpdateProductDto dto)
     {
-        var product = repository.GetProduct(id);
+        var product = await repository.GetProduct(id);
 
         if (product is null)
         {
             return Result<Product?>.NotFound("No products were found with this ID.");
         }
 
-        var productNameAlreadyExists = repository.GetProductByName(dto.Name) is not null;
+        var productNameAlreadyExists = await repository.GetProductByName(dto.Name) is not null;
 
         if (productNameAlreadyExists && dto.Name != product.Name) 
         {
@@ -63,7 +63,7 @@ public class ProductService(IProductRepository repository) : IProductService
             product.Price = dto.Price;
         }
 
-        repository.UpdateProduct(product);
+        await repository.UpdateProduct(product);
         return Result<Product?>.Success(product);
     }
 }

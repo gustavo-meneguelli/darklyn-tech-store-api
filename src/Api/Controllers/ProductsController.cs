@@ -10,17 +10,17 @@ namespace Api.Controllers;
 public class ProductsController(IProductService service) : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetAllProducts()
+    public async Task<IActionResult> GetAllProducts()
     {
-        var serviceResult = service.GetAll();
+        var serviceResult = await service.GetAll();
         
         return Ok(serviceResult.Data);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetProductById(int id)
+    public async Task<IActionResult> GetProductById(int id)
     {
-        var serviceResult = service.GetById(id);
+        var serviceResult = await service.GetById(id);
 
         if (serviceResult.TypeResult is TypeResult.NotFound)
         {
@@ -31,9 +31,9 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddProduct(CreateProductDto dto)
+    public async Task<IActionResult> AddProduct(CreateProductDto dto)
     {
-        var serviceResult = service.AddProduct(dto);
+        var serviceResult = await service.AddProduct(dto);
 
         switch (serviceResult.TypeResult)
         {
@@ -47,9 +47,9 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    public IActionResult UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+    public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
     {
-        var serviceResult = service.UpdateProduct(id, dto);
+        var serviceResult = await service.UpdateProduct(id, dto);
 
         if (serviceResult.TypeResult is TypeResult.Duplicated)
         {

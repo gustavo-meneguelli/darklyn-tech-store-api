@@ -4,9 +4,9 @@ namespace Application.Interfaces;
 
 public interface IProductRepository
 {
-    IEnumerable<Product> GetProducts();
-    Product? GetProduct(int id);
-    Product? GetProductByName(string name);
-    Product AddProduct(Product product);
-    Product UpdateProduct(Product product);
+    Task<IEnumerable<Product>> GetProducts();
+    Task<Product?> GetProduct(int id);
+    Task<Product?> GetProductByName(string name);
+    Task<Product> AddProduct(Product product);
+    Task<Product> UpdateProduct(Product product);
 }

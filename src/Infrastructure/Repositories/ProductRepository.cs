@@ -1,38 +1,40 @@
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class ProductRepository(AppDbContext context) : IProductRepository
 {
-    
-    public IEnumerable<Product> GetProducts()
+    public async Task<IEnumerable<Product>> GetProducts()
     {
-        return context.Products.ToList();
+        return await context.Products
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public Product? GetProduct(int id)
+    public async Task<Product?> GetProduct(int id)
     {
-        return context.Products.FirstOrDefault(p => p.Id == id);
+        return await context.Products.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public Product? GetProductByName(string name)
+    public async Task<Product?> GetProductByName(string name)
     {
-        return context.Products.FirstOrDefault(p => p.Name == name);
+        return await context.Products.FirstOrDefaultAsync(p => p.Name == name);
     }
 
-    public Product AddProduct(Product product)
+    public async Task<Product> AddProduct(Product product)
     {
-        context.Products.Add(product);
-        context.SaveChanges();
+        await context.Products.AddAsync(product);
+        await context.SaveChangesAsync();
         return product;
     }
 
-    public Product UpdateProduct(Product product)
+    public async Task<Product> UpdateProduct(Product product)
     {
         context.Products.Update(product);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return product;
     }
 }
