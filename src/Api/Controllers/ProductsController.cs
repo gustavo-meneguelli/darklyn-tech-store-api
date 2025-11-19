@@ -10,17 +10,17 @@ namespace Api.Controllers;
 public class ProductsController(IProductService service) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllAsync()
     {
-        var serviceResult = await service.GetAll();
+        var serviceResult = await service.GetAllAsync();
         
         return Ok(serviceResult.Data);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(int id)
+    [HttpGet("{id}"), ActionName("GetByIdAsync")]
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var serviceResult = await service.GetById(id);
+        var serviceResult = await service.GetByIdAsync(id);
 
         if (serviceResult.TypeResult is TypeResult.NotFound)
         {
@@ -31,14 +31,14 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct(CreateProductDto dto)
+    public async Task<IActionResult> AddAsync(CreateProductDto dto)
     {
-        var serviceResult = await service.AddProduct(dto);
+        var serviceResult = await service.AddAsync(dto);
 
         switch (serviceResult.TypeResult)
         {
             case TypeResult.Created when serviceResult.Data != null:
-                return CreatedAtAction(nameof(GetProductById), new { id = serviceResult.Data.Id }, serviceResult.Data);
+                return CreatedAtAction(nameof(GetByIdAsync), new { id = serviceResult.Data.Id }, serviceResult.Data);
             case TypeResult.Duplicated:
                 return Conflict(serviceResult.Message);
             default:
@@ -47,9 +47,9 @@ public class ProductsController(IProductService service) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateProductDto dto)
     {
-        var serviceResult = await service.UpdateProduct(id, dto);
+        var serviceResult = await service.UpdateAsync(id, dto);
 
         if (serviceResult.TypeResult is TypeResult.Duplicated)
         {

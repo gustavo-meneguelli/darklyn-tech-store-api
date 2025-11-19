@@ -7,31 +7,31 @@ namespace Infrastructure.Repositories;
 
 public class ProductRepository(AppDbContext context) : IProductRepository
 {
-    public async Task<IEnumerable<Product>> GetProducts()
+    public async Task<IEnumerable<Product>> GetAllAsync()
     {
         return await context.Products
             .AsNoTracking()
             .ToListAsync();
     }
 
-    public async Task<Product?> GetProduct(int id)
+    public async Task<Product?> GetByIdAsync(int id)
     {
         return await context.Products.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Product?> GetProductByName(string name)
+    public async Task<Product?> GetByNameAsync(string name)
     {
         return await context.Products.FirstOrDefaultAsync(p => p.Name == name);
     }
 
-    public async Task<Product> AddProduct(Product product)
+    public async Task<Product> AddAsync(Product product)
     {
         await context.Products.AddAsync(product);
         await context.SaveChangesAsync();
         return product;
     }
 
-    public async Task<Product> UpdateProduct(Product product)
+    public async Task<Product> UpdateAsync(Product product)
     {
         context.Products.Update(product);
         await context.SaveChangesAsync();

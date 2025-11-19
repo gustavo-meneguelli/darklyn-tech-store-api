@@ -7,25 +7,25 @@ namespace Application.Services;
 
 public class ProductService(IProductRepository repository) : IProductService
 {
-    public async Task<Result<IEnumerable<Product>>> GetAll()
+    public async Task<Result<IEnumerable<Product>>> GetAllAsync()
     {
-        var products = await repository.GetProducts();
+        var products = await repository.GetAllAsync();
         
         return Result<IEnumerable<Product>>.Success(products);
     }
 
-    public async Task<Result<Product?>> GetById(int id)
+    public async Task<Result<Product?>> GetByIdAsync(int id)
     {
-        var product = await repository.GetProduct(id);
+        var product = await repository.GetByIdAsync(id);
 
         return product is null
             ? Result<Product?>.NotFound("No product were found with this ID.")
             : Result<Product?>.Success(product);
     }
 
-    public async Task<Result<Product>> AddProduct(CreateProductDto dto)
+    public async Task<Result<Product>> AddAsync(CreateProductDto dto)
     {
-        bool productExists = await repository.GetProductByName(dto.Name) is not null;
+        bool productExists = await repository.GetByNameAsync(dto.Name) is not null;
 
         if (productExists)
         {
@@ -33,13 +33,13 @@ public class ProductService(IProductRepository repository) : IProductService
         }
         
         var product = new Product { Name = dto.Name, Price = dto.Price };
-        await repository.AddProduct(product);
+        await repository.AddAsync(product);
         return Result<Product>.Created(product);
     }
 
-    public async Task<Result<Product?>> UpdateProduct(int id, UpdateProductDto dto)
+    public async Task<Result<Product?>> UpdateAsync(int id, UpdateProductDto dto)
     {
-        var product = await repository.GetProduct(id);
+        var product = await repository.GetByIdAsync(id);
 
         if (product is null)
         {
@@ -63,7 +63,7 @@ public class ProductService(IProductRepository repository) : IProductService
             product.Price = dto.Price;
         }
 
-        await repository.UpdateProduct(product);
+        await repository.UpdateAsync(product);
         return Result<Product?>.Success(product);
     }
 }

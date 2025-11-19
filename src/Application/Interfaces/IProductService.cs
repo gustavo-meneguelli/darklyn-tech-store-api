@@ -6,8 +6,8 @@ namespace Application.Interfaces;
 
 public interface IProductService
 {
-    Task<Result<IEnumerable<Product>>> GetAll();
-    Task<Result<Product?>> GetById(int id);
-    Task<Result<Product>> AddProduct(CreateProductDto dto);
-    Task<Result<Product?>> UpdateProduct(int id, UpdateProductDto dto);
+    Task<Result<IEnumerable<Product>>> GetAllAsync();
+    Task<Result<Product?>> GetByIdAsync(int id);
+    Task<Result<Product>> AddAsync(CreateProductDto dto);
+    Task<Result<Product?>> UpdateAsync(int id, UpdateProductDto dto);
 }

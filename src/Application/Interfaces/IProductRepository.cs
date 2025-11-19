@@ -4,10 +4,10 @@ namespace Application.Interfaces;
 
 public interface IProductRepository
 {
-    Task<IEnumerable<Product>> GetProducts();
-    Task<Product?> GetProduct(int id);
-    Task<Product?> GetProductByName(string name);
-    Task<Product> AddProduct(Product product);
-    Task<Product> UpdateProduct(Product product);
+    Task<IEnumerable<Product>> GetAllAsync();
+    Task<Product?> GetByIdAsync(int id);
+    Task<Product?> GetByNameAsync(string name);
+    Task<Product> AddAsync(Product product);
+    Task<Product> UpdateAsync(Product product);
     Task<bool> ExistByNameAsync(string name);
 }
