@@ -37,4 +37,9 @@ public class ProductRepository(AppDbContext context) : IProductRepository
         await context.SaveChangesAsync();
         return product;
     }
+
+    public async Task<bool> ExistByNameAsync(string name)
+    {
+        return await context.Products.AnyAsync(p => p.Name == name);
+    }
 }

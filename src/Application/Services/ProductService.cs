@@ -46,9 +46,9 @@ public class ProductService(IProductRepository repository) : IProductService
             return Result<Product?>.NotFound("No products were found with this ID.");
         }
 
-        var productNameAlreadyExists = await repository.GetProductByName(dto.Name) is not null;
+        bool productExists = await repository.ExistByNameAsync(dto.Name);
 
-        if (productNameAlreadyExists && dto.Name != product.Name) 
+        if (productExists && dto.Name != product.Name) 
         {
             return Result<Product?>.Duplicate("Product with that name already exists.");
         }

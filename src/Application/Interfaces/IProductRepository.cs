@@ -9,4 +9,5 @@ public interface IProductRepository
     Task<Product?> GetProductByName(string name);
     Task<Product> AddProduct(Product product);
     Task<Product> UpdateProduct(Product product);
+    Task<bool> ExistByNameAsync(string name);
 }
