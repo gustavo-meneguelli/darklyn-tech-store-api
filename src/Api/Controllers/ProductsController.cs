@@ -51,6 +51,11 @@ public class ProductsController(IProductService service) : ControllerBase
     {
         var serviceResult = await service.UpdateAsync(id, dto);
 
+        if (serviceResult.TypeResult is TypeResult.NotFound)
+        {
+            return NotFound(serviceResult.Message);
+        }
+
         if (serviceResult.TypeResult is TypeResult.Duplicated)
         {
             return Conflict(serviceResult.Message);
