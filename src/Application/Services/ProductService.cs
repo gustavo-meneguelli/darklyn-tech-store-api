@@ -26,7 +26,7 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
 
     public async Task<Result<Product>> AddAsync(CreateProductDto dto)
     {
-        bool productExists = await repository.GetByNameAsync(dto.Name) is not null;
+        bool productExists = await repository.ExistByNameAsync(dto.Name);
 
         if (productExists)
         {
