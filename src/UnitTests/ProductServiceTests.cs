@@ -1,3 +1,4 @@
+using Application.DTO;
 using Moq;
 using Application.Services;
 using Application.Interfaces;
@@ -15,7 +16,7 @@ public class ProductServiceTests
         var repositoryMock = new Mock<IProductRepository>();
         var mapperMock = new Mock<IMapper>();
 
-        var fakeProduct = new Product 
+        var model = new Product 
         { 
             Id = 1, 
             Name = "Teste", 
@@ -24,7 +25,7 @@ public class ProductServiceTests
 
         repositoryMock
             .Setup(repo => repo.GetByIdAsync(1))
-            .ReturnsAsync(fakeProduct);
+            .ReturnsAsync(model);
 
         var service = new ProductService(repositoryMock.Object, mapperMock.Object);
 
@@ -57,5 +58,141 @@ public class ProductServiceTests
         Assert.NotNull(result);
         Assert.Equal(Application.Enums.TypeResult.NotFound, result.TypeResult);
         Assert.Equal("No product were found with this ID.", result.Message);
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_ShouldReturnDuplicated_WhenProductExists()
+    {
+        //ARRANGE
+        var repositoryMock = new Mock<IProductRepository>();
+        var mapperMock = new Mock<IMapper>();
+        
+        var model = new Product 
+        { 
+            Id = 1, 
+            Name = "Teste", 
+            Price = 10 
+        };
+        
+        repositoryMock
+            .Setup(repo => repo.GetByIdAsync(1))
+            .ReturnsAsync(model);
+
+        repositoryMock
+            .Setup(repo => repo.ExistByNameAsync("Outro Teste"))
+            .ReturnsAsync(true);
+        
+        var service = new ProductService(repositoryMock.Object, mapperMock.Object);
+
+        //ACT
+        var fakeDto = new UpdateProductDto { Name = "Outro Teste",  Price = 10 };
+        var result = await service.UpdateAsync(1, fakeDto);
+        
+        //ASSERT
+        Assert.NotNull(result);
+        Assert.Equal(Application.Enums.TypeResult.Duplicated, result.TypeResult);
+        Assert.Equal("Product with that name already exists.", result.Message);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldReturnSuccess_WhenDataIsValid()
+    {
+        //ARRANGE
+        var repositoryMock = new Mock<IProductRepository>();
+        var configuration = new MapperConfiguration(cfg => 
+        {
+            cfg.AddProfile(new Application.Mappings.MappingProfile());
+        });
+
+        var mapper = configuration.CreateMapper();
+        
+        var model = new Product 
+        { 
+            Id = 1, 
+            Name = "Teste", 
+            Price = 10 
+        };
+        
+        repositoryMock
+            .Setup(repo => repo.GetByIdAsync(1))
+            .ReturnsAsync(model);
+        repositoryMock
+            .Setup(repo => repo.ExistByNameAsync("Outro Teste"))
+            .ReturnsAsync(false);
+        
+        var service = new ProductService(repositoryMock.Object, mapper);
+        
+        //ACT
+        var fakeDto = new UpdateProductDto { Name = "Outro Teste",  Price = 10 };
+        var result = await service.UpdateAsync(1, fakeDto);
+        
+        //ASSERT
+        Assert.NotNull(result);
+        Assert.Equal(Application.Enums.TypeResult.Success, result.TypeResult);
+        Assert.Equal("Outro Teste", result.Data?.Name);
+    }
+
+    [Fact]
+    public async Task AddAsync_ShouldReturnError_WhenNameIsDuplicate()
+    {
+        //ARRANGE
+        var repositoryMock = new Mock<IProductRepository>();
+        var configuration = new MapperConfiguration(cfg => 
+        {
+            cfg.AddProfile(new Application.Mappings.MappingProfile());
+        });
+        var mapper = configuration.CreateMapper();
+
+        var model = new CreateProductDto
+        {
+            Name = "Teste",
+            Price = 10
+        };
+        
+        repositoryMock
+            .Setup(repo => repo.ExistByNameAsync(model.Name))
+            .ReturnsAsync(true);
+        
+        var service = new ProductService(repositoryMock.Object, mapper);
+        
+        //ACT
+        var result = await service.AddAsync(model);
+        
+        //ASSERT
+        Assert.NotNull(result);
+        Assert.Equal(Application.Enums.TypeResult.Duplicated ,result.TypeResult);
+    }
+
+    [Fact]
+    public async Task AddAsync_ShouldReturnSuccess_WhenDataIsValid()
+    {
+        //ARRANGE
+        var repositoryMock = new Mock<IProductRepository>();
+        var mapperMock = new MapperConfiguration(cfg => 
+        {
+            cfg.AddProfile(new Application.Mappings.MappingProfile());
+        });
+        var mapper = mapperMock.CreateMapper();
+
+        var model = new CreateProductDto()
+        {
+            Name = "Teste",
+            Price = 10
+        };
+        
+        repositoryMock
+            .Setup(repo => repo.ExistByNameAsync(model.Name))
+            .ReturnsAsync(false);
+        
+        var service = new ProductService(repositoryMock.Object, mapper);
+        
+        //ACT
+        var result = await service.AddAsync(model);
+        
+        //ASSERT
+        Assert.NotNull(result.Data);
+        Assert.Equal(Application.Enums.TypeResult.Created, result.TypeResult);
+        Assert.Equal(model.Name, result.Data.Name);
+        Assert.Equal(model.Price, result.Data.Price);
     }
 }
