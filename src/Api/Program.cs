@@ -6,8 +6,18 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration
+        .WriteTo.Console() 
+        .WriteTo.File(
+            path: "logs/api-log-.txt", 
+            rollingInterval: RollingInterval.Day, 
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+        .MinimumLevel.Information());
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
