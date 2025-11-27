@@ -25,6 +25,7 @@ public static class AppServiceExtension
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<DbSeeder>();
 
         return services;
     }
@@ -90,5 +91,23 @@ public static class AppServiceExtension
             });
 
         return services;
+    }
+
+    public static async Task UseDbSeeder(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        
+        var services = scope.ServiceProvider;
+
+        try
+        {
+            var context = services.GetRequiredService<DbSeeder>();
+
+            await context.SeedAsync();
+        }
+        catch (Exception ex)
+        {
+            app.Logger.LogError(ex, "An error occurred seeding the DB.");
+        }
     }
 }

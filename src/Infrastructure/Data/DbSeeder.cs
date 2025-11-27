@@ -1,0 +1,29 @@
+using Application.Interfaces;
+using Domain.Enums;
+using Domain.Models;
+using Microsoft.Extensions.Configuration;
+
+namespace Infrastructure.Data;
+
+public class DbSeeder(IUserRepository userRepository, IPasswordHash passwordHash, IConfiguration configuration)
+{
+    public async Task SeedAsync()
+    {
+        var userExists = await userRepository.GetUserByUsernameAsync("admin");
+
+        if (userExists is null)
+        {
+            var password = configuration["AdminSettings:Password"]
+                ?? throw new InvalidOperationException("AdminSettings:Password is null");
+            
+            var user = new User()
+            {
+                Username = "admin",
+                Role = UserRole.Admin,
+                PasswordHash = passwordHash.HashPassword(password)
+            };
+            
+            await userRepository.AddUserAsync(user);
+        }
+    }
+}
