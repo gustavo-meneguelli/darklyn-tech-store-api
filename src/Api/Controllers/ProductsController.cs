@@ -65,4 +65,18 @@ public class ProductsController(IProductService service) : ControllerBase
         
         return Ok(serviceResult.Data);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var serviceResult = await service.DeleteAsync(id);
+
+        if (serviceResult.TypeResult == TypeResult.NotFound)
+        {
+            return NotFound(serviceResult.Message);
+        }
+        
+        return NoContent();
+    }
 }

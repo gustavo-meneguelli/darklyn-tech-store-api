@@ -40,4 +40,10 @@ public class ProductRepository(AppDbContext context) : IProductRepository
     {
         return await context.Products.AnyAsync(p => p.Name == name);
     }
+
+    public async Task DeleteAsync(Product product)
+    {
+        context.Products.Remove(product);
+        await context.SaveChangesAsync();
+    }
 }

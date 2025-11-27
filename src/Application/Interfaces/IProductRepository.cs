@@ -10,4 +10,5 @@ public interface IProductRepository
     Task<Product> AddAsync(Product product);
     Task UpdateAsync(Product product);
     Task<bool> ExistByNameAsync(string name);
+    Task DeleteAsync(Product product);
 }

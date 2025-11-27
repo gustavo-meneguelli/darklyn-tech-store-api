@@ -64,4 +64,18 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
         await repository.UpdateAsync(product);
         return Result<Product?>.Success(product);
     }
+
+    public async Task<Result<Product?>> DeleteAsync(int id)
+    {
+        var product = await repository.GetByIdAsync(id);
+
+        if (product is null)
+        {
+            return Result<Product?>.NotFound("No product were found with this ID.");
+        }
+        
+        await repository.DeleteAsync(product);
+        
+        return Result<Product?>.Success(product);
+    }
 }
