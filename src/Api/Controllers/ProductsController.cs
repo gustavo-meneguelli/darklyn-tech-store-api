@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController(IProductService service) : ControllerBase
@@ -19,6 +20,7 @@ public class ProductsController(IProductService service) : ControllerBase
         return Ok(serviceResult.Data);
     }
 
+    [Authorize]
     [HttpGet("{id}"), ActionName("GetByIdAsync")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
@@ -32,6 +34,7 @@ public class ProductsController(IProductService service) : ControllerBase
         return Ok(serviceResult.Data);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> AddAsync(CreateProductDto dto)
     {
@@ -48,6 +51,7 @@ public class ProductsController(IProductService service) : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateProductDto dto)
     {
