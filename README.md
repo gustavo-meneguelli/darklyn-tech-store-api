@@ -18,7 +18,7 @@ O foco atual é sair do básico (apenas Controllers) e aplicar padrões de organ
 
 ## Como rodar (na minha máquina funcionou assim)
 1.  Clone o repositório.
-2.  Certifique-se de ter o SDK do .NET 8 instalado.
+2.  Certifique-se de ter o SDK do .NET 10 instalado.
 3.  Entre na pasta `src/Api`.
 4.  Rode `dotnet run`.
 5.  O banco de dados (SQLite) deve ser criado automaticamente na primeira execução.
