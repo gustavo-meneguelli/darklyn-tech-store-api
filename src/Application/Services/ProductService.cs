@@ -8,11 +8,11 @@ namespace Application.Services;
 
 public class ProductService(IProductRepository repository, IMapper mapper) : IProductService
 {
-    public async Task<Result<IEnumerable<Product>>> GetAllAsync()
+    public async Task<Result<PagedResult<Product>>> GetAllAsync(PaginationParams pagination)
     {
-        var products = await repository.GetAllAsync();
+        var pagedResult = await repository.GetAllAsync(pagination);
         
-        return Result<IEnumerable<Product>>.Success(products);
+        return Result<PagedResult<Product>>.Success(pagedResult);
     }
 
     public async Task<Result<Product?>> GetByIdAsync(int id)

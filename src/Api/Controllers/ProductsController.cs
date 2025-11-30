@@ -13,9 +13,9 @@ public class ProductsController(IProductService service) : ControllerBase
 {
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams paginationParams)
     {
-        var serviceResult = await service.GetAllAsync();
+        var serviceResult = await service.GetAllAsync(paginationParams);
         
         return Ok(serviceResult.Data);
     }

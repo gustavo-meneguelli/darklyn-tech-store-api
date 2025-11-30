@@ -6,7 +6,7 @@ namespace Application.Interfaces;
 
 public interface IProductService
 {
-    Task<Result<IEnumerable<Product>>> GetAllAsync();
+    Task<Result<PagedResult<Product>>> GetAllAsync(PaginationParams paginationParams);
     Task<Result<Product?>> GetByIdAsync(int id);
     Task<Result<Product>> AddAsync(CreateProductDto dto);
     Task<Result<Product?>> UpdateAsync(int id, UpdateProductDto dto);

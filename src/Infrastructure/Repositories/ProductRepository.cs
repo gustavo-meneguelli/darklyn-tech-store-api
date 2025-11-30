@@ -1,4 +1,6 @@
+using Application.DTO;
 using Application.Interfaces;
+using Application.Utilities;
 using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +9,27 @@ namespace Infrastructure.Repositories;
 
 public class ProductRepository(AppDbContext context) : IProductRepository
 {
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<PagedResult<Product>> GetAllAsync(PaginationParams paginationParams)
     {
-        return await context.Products
-            .AsNoTracking()
+        var totalCount = await context.Products.CountAsync();
+
+        var items = await context.Products
+            .OrderBy(p => p.Id)
+            .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
+            .Take(paginationParams.PageSize)
+            .AsNoTracking() 
             .ToListAsync();
+
+        var totalPages = (int)Math.Ceiling(totalCount / (double)paginationParams.PageSize);
+
+        return new PagedResult<Product>
+        {
+            Items = items,
+            CurrentPage = paginationParams.PageNumber,
+            PageSize = paginationParams.PageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages 
+        };
     }
 
     public async Task<Product?> GetByIdAsync(int id)

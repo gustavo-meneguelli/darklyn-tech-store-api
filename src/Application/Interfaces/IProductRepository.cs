@@ -1,10 +1,12 @@
+using Application.DTO;
+using Application.Utilities;
 using Domain.Models;
 
 namespace Application.Interfaces;
 
 public interface IProductRepository
 {
-    Task<IEnumerable<Product>> GetAllAsync();
+    Task<PagedResult<Product>> GetAllAsync(PaginationParams paginationParams);
     Task<Product?> GetByIdAsync(int id);
     Task<Product?> GetByNameAsync(string name);
     Task<Product> AddAsync(Product product);
