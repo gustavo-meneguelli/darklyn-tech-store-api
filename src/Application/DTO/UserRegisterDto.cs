@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace Application.DTOs.Auth;
+namespace Application.DTO;
 
 public class UserRegisterDto
 {

@@ -1,7 +1,4 @@
 using Application.Interfaces;
-using Application.Interfaces.Repositories;
-using Application.Interfaces.Security;
-using Application.Interfaces.Services;
 using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;

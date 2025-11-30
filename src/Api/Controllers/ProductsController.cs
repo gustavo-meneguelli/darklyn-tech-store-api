@@ -1,7 +1,6 @@
-using Application.Common.Models;
-using Application.DTOs.Products;
+using Application.DTO;
 using Application.Enums;
-using Application.Interfaces.Services;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

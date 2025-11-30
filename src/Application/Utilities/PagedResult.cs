@@ -1,4 +1,4 @@
-namespace Application.Common.Models;
+namespace Application.Utilities;
 
 public class PagedResult<T>
 {

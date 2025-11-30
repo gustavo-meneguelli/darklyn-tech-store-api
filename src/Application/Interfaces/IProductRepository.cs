@@ -1,7 +1,8 @@
-using Application.Common.Models;
-using Domain.Entities;
+using Application.DTO;
+using Application.Utilities;
+using Domain.Models;
 
-namespace Application.Interfaces.Repositories;
+namespace Application.Interfaces;
 
 public interface IProductRepository
 {

@@ -1,6 +1,6 @@
-using Domain.Entities;
+using Domain.Models;
 
-namespace Application.Interfaces.Security;
+namespace Application.Interfaces;
 
 public interface ITokenService
 {

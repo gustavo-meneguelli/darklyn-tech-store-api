@@ -1,9 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.DTOs.Auth;
-using Application.DTOs.Products;
-using Domain.Entities;
+using Application.DTO;
 
 namespace IntegrationTests;
 
@@ -57,7 +55,7 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
         // 2. ACT 
         var productHttpResponse = await _client.PostAsJsonAsync("/api/products", newProduct);
         
-        var returnedProduct = await productHttpResponse.Content.ReadFromJsonAsync<Product>();
+        var returnedProduct = await productHttpResponse.Content.ReadFromJsonAsync<Domain.Models.Product>();
 
         // 3. ASSERT
         Assert.Equal(HttpStatusCode.Created, productHttpResponse.StatusCode);

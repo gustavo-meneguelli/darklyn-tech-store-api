@@ -1,6 +1,6 @@
 using Application.Enums;
 
-namespace Application.Common.Models;
+namespace Application.Utilities;
 
 public class Result<T>
 {
