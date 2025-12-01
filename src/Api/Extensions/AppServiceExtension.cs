@@ -110,4 +110,23 @@ public static class AppServiceExtension
             app.Logger.LogError(ex, "An error occurred seeding the DB.");
         }
     }
+    
+    public static IServiceCollection AddCorsConfig(this IServiceCollection services, IConfiguration config)
+    {
+        var allowedOrigin = config["CorsSettings:AllowedOrigins"] 
+                            ?? throw new InvalidOperationException("CorsSettings:AllowedOrigins is missing in appsettings.");
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("WebUiPolicy", builder =>
+            {
+                builder
+                    .WithOrigins(allowedOrigin)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+
+        return services;
+    }
 }

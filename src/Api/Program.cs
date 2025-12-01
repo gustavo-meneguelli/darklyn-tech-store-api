@@ -26,6 +26,8 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductDtoValidator>();
 builder.Services.AddAutoMapper(typeof(Application.Mappings.MappingProfile));
 
+builder.Services.AddCorsConfig(builder.Configuration);
+
 var app = builder.Build();
 
 app.UseMiddleware<Api.Middlewares.GlobalErrorHandlerMiddleware>();
@@ -37,6 +39,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("WebUiPolicy");
 
 app.UseAuthentication(); 
 app.UseAuthorization();
