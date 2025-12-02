@@ -1,8 +1,10 @@
-using Application.DTO;
+using Application.Common.Models;
+using Application.DTO.Products;
 using Application.Interfaces;
-using Application.Utilities;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
 using AutoMapper;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.Services;
 

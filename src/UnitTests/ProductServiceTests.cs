@@ -1,9 +1,10 @@
-using Application.DTO;
+using Application.DTO.Products;
 using Moq;
 using Application.Services;
 using Application.Interfaces;
-using Domain.Models;
+using Application.Interfaces.Repositories;
 using AutoMapper;
+using Domain.Entities;
 
 namespace UnitTests;
 

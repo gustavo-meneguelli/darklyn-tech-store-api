@@ -1,7 +1,7 @@
-using Application.DTO;
-using Application.Utilities;
+using Application.Common.Models;
+using Application.DTO.Auth;
 
-namespace Application.Interfaces;
+namespace Application.Interfaces.Security;
 
 public interface IAuthService
 {

@@ -1,4 +1,4 @@
-using Application.DTO;
+using Application.DTO.Products;
 using Application.Validators;
 
 namespace UnitTests;
