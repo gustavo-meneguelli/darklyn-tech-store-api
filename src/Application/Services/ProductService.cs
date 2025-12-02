@@ -1,6 +1,5 @@
 using Application.Common.Models;
 using Application.DTO.Products;
-using Application.Interfaces;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using AutoMapper;

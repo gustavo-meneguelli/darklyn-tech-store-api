@@ -1,6 +1,5 @@
 using Application.Common.Models;
 using Application.DTO.Auth;
-using Application.Interfaces;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Security;
 using Application.Interfaces.Services;
