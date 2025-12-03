@@ -118,8 +118,12 @@ public static class AppServiceExtension
         try
         {
             var dbContext = services.GetRequiredService<AppDbContext>();
-            await dbContext.Database.MigrateAsync(); 
 
+            if (dbContext.Database.IsRelational())
+            {
+                await dbContext.Database.MigrateAsync(); 
+            }
+            
             var seeder = services.GetRequiredService<DbSeeder>();
             await seeder.SeedAsync();
         }

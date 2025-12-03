@@ -4,48 +4,42 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace IntegrationTests;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    private readonly IServiceProvider _inMemoryServiceProvider = new ServiceCollection()
-        .AddEntityFrameworkInMemoryDatabase()
-        .BuildServiceProvider();
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((hostingContext, config) =>
-        {
-            var settings = new Dictionary<string, string>
-            {
-                { "AdminSettings:Password", "SenhaTeste123" }
-            };
-
-            config.AddInMemoryCollection(settings!);
-        });
-            
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-
-            if (descriptor != null)
-            {
-                services.Remove(descriptor); // Se houver resquício do banco de dados real ele vai remover.
-            }
+            services.Remove(
+                services.Single(d =>
+                    d.ServiceType == typeof(IDbContextOptionsConfiguration<AppDbContext>)));
 
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseInMemoryDatabase("InMemoryDbForTesting"); // Utilizará uma "memória falsa" para realizar o teste.
-                options.UseInternalServiceProvider(_inMemoryServiceProvider);
+                options.UseInMemoryDatabase("InMemoryDbForTesting");
+                
+                options.ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
 
             var sp = services.BuildServiceProvider();
+            
             using var scope = sp.CreateScope();
-            var scopedServices = scope.ServiceProvider;
-            var db = scopedServices.GetRequiredService<AppDbContext>();
-
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            
             db.Database.EnsureCreated();
+        });
+        
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string>
+            {
+                { "AdminSettings:Password", "SenhaTeste123" }
+            }!);
         });
     }
 }

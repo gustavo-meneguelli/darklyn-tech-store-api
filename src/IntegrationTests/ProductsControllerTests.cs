@@ -23,10 +23,8 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/Login", loginDto);
     
         var responseContent = await loginResponse.Content.ReadAsStringAsync();
-
-        var token = responseContent; 
-    
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseContent);
     }
 
     [Fact]
