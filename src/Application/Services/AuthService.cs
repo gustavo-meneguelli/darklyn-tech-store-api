@@ -44,7 +44,7 @@ public class AuthService(IUserRepository userRepository, IPasswordHash passwordH
         var user = new User
             { Username = dto.Username, PasswordHash = passwordHash.HashPassword(dto.Password), Role = UserRole.Common};
         
-        await userRepository.AddUserAsync(user);
+        await userRepository.AddAsync(user);
         
         return Result<string>.Success("User created with success");
     }

@@ -1,10 +1,9 @@
+using Application.Interfaces.Generics;
 using Domain.Entities;
 
 namespace Application.Interfaces.Repositories;
 
-public interface IUserRepository
+public interface IUserRepository : IRepository<User>
 {
     Task<User?> GetUserByUsernameAsync(string username);
-    Task<User?> GetUserByIdAsync(int userId);
-    Task<User> AddUserAsync(User user);
 }

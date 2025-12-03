@@ -24,7 +24,7 @@ public class DbSeeder(IUserRepository userRepository, IPasswordHash passwordHash
                 PasswordHash = passwordHash.HashPassword(password)
             };
             
-            await userRepository.AddUserAsync(user);
+            await userRepository.AddAsync(user);
         }
     }
 }
