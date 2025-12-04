@@ -1,7 +1,6 @@
 using Application.DTO.Products;
 using Moq;
 using Application.Services;
-using Application.Interfaces;
 using Application.Interfaces.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -15,20 +14,24 @@ public class ProductServiceTests
     {
         // ARRANGE
         var repositoryMock = new Mock<IProductRepository>();
-        var mapperMock = new Mock<IMapper>();
+        var configuration = new MapperConfiguration(cfg => 
+        {
+            cfg.AddProfile(new Application.Mappings.MappingProfile());
+        });
+        var mapper = configuration.CreateMapper();
 
         var model = new Product 
         { 
             Id = 1, 
             Name = "Teste", 
-            Price = 10 
+            Price = 10,
         };
 
         repositoryMock
             .Setup(repo => repo.GetByIdAsync(1))
             .ReturnsAsync(model);
-
-        var service = new ProductService(repositoryMock.Object, mapperMock.Object);
+        
+        var service = new ProductService(repositoryMock.Object, mapper);
 
         // ACT
         var result = await service.GetByIdAsync(1);
@@ -58,7 +61,7 @@ public class ProductServiceTests
         // ASSERT
         Assert.NotNull(result);
         Assert.Equal(Application.Enums.TypeResult.NotFound, result.TypeResult);
-        Assert.Equal("No product were found with this ID.", result.Message);
+        Assert.Equal("No products were found with this ID.", result.Message);
     }
     
     [Fact]
