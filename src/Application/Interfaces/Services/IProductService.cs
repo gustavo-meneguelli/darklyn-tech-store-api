@@ -6,9 +6,9 @@ namespace Application.Interfaces.Services;
 
 public interface IProductService
 {
-    Task<Result<PagedResult<Product>>> GetAllAsync(PaginationParams paginationParams);
-    Task<Result<Product?>> GetByIdAsync(int id);
-    Task<Result<Product>> AddAsync(CreateProductDto dto);
-    Task<Result<Product?>> UpdateAsync(int id, UpdateProductDto dto);
-    Task<Result<Product?>> DeleteAsync(int id);
+    Task<Result<PagedResult<ProductResponseDto>>> GetAllAsync(PaginationParams paginationParams);
+    Task<Result<ProductResponseDto?>> GetByIdAsync(int id);
+    Task<Result<ProductResponseDto>> AddAsync(CreateProductDto dto);
+    Task<Result<ProductResponseDto?>> UpdateAsync(int id, UpdateProductDto dto);
+    Task<Result<ProductResponseDto?>> DeleteAsync(int id);
 }

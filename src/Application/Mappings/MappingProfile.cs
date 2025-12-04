@@ -12,5 +12,6 @@ public class MappingProfile : Profile
         CreateMap<UpdateProductDto, Product>()
             .ForMember(dest => dest.Name, opt => opt.Condition(src => src.Name != string.Empty))
             .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price != 0));
+        CreateMap<Product, ProductResponseDto>();
     }
 }
