@@ -5,7 +5,7 @@ namespace Infrastructure.Generics;
 
 public class Repository<T>(AppDbContext context) : IRepository<T> where T : class
 {
-    public async Task<T?> GetByIdAsync(int id)
+    public virtual async Task<T?> GetByIdAsync(int id)
     {
         return await context.Set<T>().FindAsync(id);
     }
@@ -19,7 +19,6 @@ public class Repository<T>(AppDbContext context) : IRepository<T> where T : clas
 
     public async Task UpdateAsync(T entity)
     {
-        context.Set<T>().Update(entity);
         await context.SaveChangesAsync();
     }
 

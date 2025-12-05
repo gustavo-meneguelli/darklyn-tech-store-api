@@ -1,0 +1,53 @@
+using Application.Common.Models;
+using Application.DTO.Categories;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
+using AutoMapper;
+using Domain.Entities;
+
+namespace Application.Services;
+
+public class CategoryService(ICategoryRepository repository, IMapper mapper) : ICategoryService
+{
+    public async Task<Result<IEnumerable<CategoryResponseDto>>> GetAllAsync()
+    {
+        var categories = await repository.GetAllAsync();
+        
+        var response = mapper.Map<IEnumerable<CategoryResponseDto>>(categories);
+        
+        return Result<IEnumerable<CategoryResponseDto>>.Success(response);
+    }
+
+    public async Task<Result<CategoryResponseDto>> GetByIdAsync(int id)
+    {
+        var category = await repository.GetByIdAsync(id);
+
+        if (category is null)
+        {
+            return Result<CategoryResponseDto>.NotFound("Category not found.");
+        }
+
+        var dto = mapper.Map<CategoryResponseDto>(category);
+        
+        return Result<CategoryResponseDto>.Success(dto);
+    }
+
+    public async Task<Result<CategoryResponseDto>> AddAsync(CreateCategoryDto dto)
+    {
+        
+        var categoryExists = await repository.ExistsByNameAsync(dto.Name);
+
+        if (categoryExists)
+        {
+            return Result<CategoryResponseDto>.Duplicate("Category with the same name already exists.");
+        }
+        
+        var category = mapper.Map<Category>(dto);
+        
+        await repository.AddAsync(category);
+        
+        var responseDto = mapper.Map<CategoryResponseDto>(category);
+        
+        return Result<CategoryResponseDto>.Created(responseDto);
+    }
+}

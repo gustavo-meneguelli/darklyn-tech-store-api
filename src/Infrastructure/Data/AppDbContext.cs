@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Product> Products { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Category> Categories { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -17,6 +18,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
         modelBuilder.Entity<User>()
             .HasQueryFilter(u => !u.IsDeleted);//Exibe apenas usuários que não foram deletados
+        
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict); //Não deixa deletar categoria se houver produtos relacionado 
     }
     
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

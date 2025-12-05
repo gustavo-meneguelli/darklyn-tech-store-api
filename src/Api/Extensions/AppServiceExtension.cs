@@ -29,6 +29,8 @@ public static class AppServiceExtension
 
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IRepository<User>, Repository<User>>();
         services.AddScoped<IRepository<Product>, Repository<Product>>(); 
         services.AddScoped<IProductRepository, ProductRepository>();

@@ -33,7 +33,8 @@ public class CreateProductDtoValidatorTests
         var model = new CreateProductDto 
         { 
             Name = "Produto Teste", 
-            Price = 10 
+            Price = 10,
+            CategoryId = 1
         };
         
         //ACT

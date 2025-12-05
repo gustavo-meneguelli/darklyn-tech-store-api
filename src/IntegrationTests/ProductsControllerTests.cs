@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Application.DTO.Auth;
+using Application.DTO.Categories;
 using Application.DTO.Products;
 using Domain.Entities;
 
@@ -45,11 +46,15 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
     {
         // 1. ARRANGE
         await Authenticate();
-        
+
+        var newCategory = new CreateCategoryDto { Name = "Tech" };
+        var categoryResponse = await _client.PostAsJsonAsync("/api/categories", newCategory);
+    
         var newProduct = new CreateProductDto
         {
             Name = "Teclado Mecânico",
-            Price = 150.00m
+            Price = 150.00m,
+            CategoryId = 1 
         };
 
         // 2. ACT 

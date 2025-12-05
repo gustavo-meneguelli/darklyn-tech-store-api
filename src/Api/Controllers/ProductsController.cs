@@ -81,6 +81,8 @@ public class ProductsController(IProductService service) : ControllerBase
         {
             case TypeResult.Created when serviceResult.Data != null:
                 return CreatedAtAction(nameof(GetByIdAsync), new { id = serviceResult.Data.Id }, serviceResult.Data);
+            case TypeResult.NotFound:
+                return NotFound(serviceResult.Message);
             case TypeResult.Duplicated:
                 return Conflict(serviceResult.Message);
             default:
@@ -116,17 +118,12 @@ public class ProductsController(IProductService service) : ControllerBase
     {
         var serviceResult = await service.UpdateAsync(id, dto);
 
-        if (serviceResult.TypeResult is TypeResult.NotFound)
+        return serviceResult.TypeResult switch
         {
-            return NotFound(serviceResult.Message);
-        }
-
-        if (serviceResult.TypeResult is TypeResult.Duplicated)
-        {
-            return Conflict(serviceResult.Message);
-        }
-        
-        return Ok(serviceResult.Data);
+            TypeResult.NotFound => NotFound(serviceResult.Message),
+            TypeResult.Duplicated => Conflict(serviceResult.Message),
+            _ => Ok(serviceResult.Data)
+        };
     }
 
     /// <summary>

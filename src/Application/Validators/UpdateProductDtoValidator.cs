@@ -16,5 +16,10 @@ public class UpdateProductDtoValidator : AbstractValidator<UpdateProductDto>
             .GreaterThan(0).WithMessage("Price must be greater than 0")
             .When(product => product.Price != 0)
             .LessThan(100000).WithMessage("Price must be less than R$100.000,00");
+        
+        RuleFor(product => product.CategoryId)
+            .GreaterThan(0)
+            .When(product => product.CategoryId != 0)
+            .WithMessage("Invalid Category ID. It must be greater than 0.");
     }
 }

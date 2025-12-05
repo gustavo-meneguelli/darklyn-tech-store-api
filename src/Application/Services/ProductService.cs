@@ -7,12 +7,15 @@ using Domain.Entities;
 
 namespace Application.Services;
 
-public class ProductService(IProductRepository repository, IMapper mapper) : IProductService
+public class ProductService(
+    IProductRepository productRepository,
+    ICategoryRepository categoryRepository,
+    IMapper mapper) : IProductService
 {
     public async Task<Result<PagedResult<ProductResponseDto>>> GetAllAsync(PaginationParams pagination)
     {
-        var pagedResult = await repository.GetAllAsync(pagination);
-        
+        var pagedResult = await productRepository.GetAllAsync(pagination);
+
         var listProductResponseDtos = mapper.Map<IEnumerable<ProductResponseDto>>(pagedResult.Items);
 
         var resultDto = new PagedResult<ProductResponseDto>
@@ -23,19 +26,19 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
             CurrentPage = pagedResult.CurrentPage,
             TotalPages = pagedResult.TotalPages
         };
-        
+
         return Result<PagedResult<ProductResponseDto>>.Success(resultDto);
     }
 
     public async Task<Result<ProductResponseDto?>> GetByIdAsync(int id)
     {
-        var product = await repository.GetByIdAsync(id);
+        var product = await productRepository.GetByIdAsync(id);
 
         if (product is null)
         {
             return Result<ProductResponseDto?>.NotFound("No products were found with this ID.");
         }
-            
+
         var productResponseDto = mapper.Map<Product, ProductResponseDto>(product);
 
         return Result<ProductResponseDto?>.Success(productResponseDto);
@@ -44,65 +47,84 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
 
     public async Task<Result<ProductResponseDto>> AddAsync(CreateProductDto dto)
     {
-        bool productExists = await repository.ExistByNameAsync(dto.Name);
+        bool productExists = await productRepository.ExistByNameAsync(dto.Name);
 
         if (productExists)
         {
             return Result<ProductResponseDto>.Duplicate("Product with that name already exists.");
         }
         
+        var category = await categoryRepository.GetByIdAsync(dto.CategoryId);
+
+        if (category is null)
+        {
+            return Result<ProductResponseDto>.NotFound("No category found with this ID.");
+        }
+
         var product = mapper.Map<Product>(dto);
-        
-        await repository.AddAsync(product);
-        
+
+        await productRepository.AddAsync(product);
+
         var productReponseDto = mapper.Map<Product, ProductResponseDto>(product);
-        
+
         return Result<ProductResponseDto>.Created(productReponseDto);
     }
 
     public async Task<Result<ProductResponseDto?>> UpdateAsync(int id, UpdateProductDto dto)
     {
-        var product = await repository.GetByIdAsync(id);
+        var product = await productRepository.GetByIdAsync(id);
 
         if (product is null)
         {
             return Result<ProductResponseDto?>.NotFound("No products were found with this ID.");
         }
-        
+
         bool isNecessaryChangeName = dto.Name != string.Empty && dto.Name != product.Name;
 
         if (isNecessaryChangeName)
         {
-            bool nameExists = await repository.ExistByNameAsync(dto.Name);
+            bool nameExists = await productRepository.ExistByNameAsync(dto.Name);
 
             if (nameExists)
             {
                 return Result<ProductResponseDto?>.Duplicate("Product with that name already exists.");
             }
         }
+        
+        bool isNecessaryChangeCategoryId = dto.CategoryId != 0 && dto.CategoryId != product.CategoryId;
+
+        if (isNecessaryChangeCategoryId)
+        {
+            var category = await categoryRepository.GetByIdAsync(dto.CategoryId);
+            
+            if (category is null)
+            {
+                return Result<ProductResponseDto?>.NotFound("No category found with this ID.");
+            }
+        }
 
         mapper.Map(dto, product);
-        
-        await repository.UpdateAsync(product);
-        
-        var productReponseDto = mapper.Map<Product, ProductResponseDto>(product);
-        
-        return Result<ProductResponseDto?>.Success(productReponseDto);
+
+        await productRepository.UpdateAsync(product);
+
+        var productResponseDto = mapper.Map<Product, ProductResponseDto>(product);
+
+        return Result<ProductResponseDto?>.Success(productResponseDto);
     }
 
     public async Task<Result<ProductResponseDto?>> DeleteAsync(int id)
     {
-        var product = await repository.GetByIdAsync(id);
+        var product = await productRepository.GetByIdAsync(id);
 
         if (product is null)
         {
             return Result<ProductResponseDto?>.NotFound("No product were found with this ID.");
         }
-        
-        await repository.DeleteAsync(product);
-        
+
+        await productRepository.DeleteAsync(product);
+
         var productReponseDto = mapper.Map<Product, ProductResponseDto>(product);
-        
+
         return Result<ProductResponseDto?>.Success(productReponseDto);
     }
 }
