@@ -1,44 +1,73 @@
-# Product Management API - Estudo
+# Darklyn Tech Store API
 
-> **Nota:** Este é um projeto puramente educacional. Não sou um programador profissional (ainda), sou um estudante explorando o ecossistema .NET. O código aqui reflete meu aprendizado atual.
+Este repositório contém a API Backend de um e-commerce de produtos tecnológicos.
 
-## Sobre o Projeto
-Estou construindo esta API para estudar conceitos de desenvolvimento Backend com C#. O objetivo é sair do básico e aplicar padrões de mercado, containerização e deploy na nuvem.
+O objetivo principal deste projeto não é apenas criar um CRUD, mas sim aplicar Engenharia de Software e boas práticas de mercado, simulando um ambiente real de desenvolvimento corporativo utilizando o ecossistema .NET mais recente.
 
-O projeto evoluiu de um banco local para uma arquitetura pronta para produção com PostgreSQL.
+Swagger (Live Demo): https://darklyn-api.onrender.com/swagger
+Front-end (Visual): https://github.com/gustavo-meneguelli/darklyn-tech-store-web
 
-## 🛠️ Tech Stack & Conceitos Aplicados:
-* **.NET 10 Web API**
-* **Arquitetura em Camadas** (Domain, Application, Infra, API)
-* **Entity Framework Core** com **PostgreSQL**
-* **Docker** (Multi-stage build)
-* **Autenticação JWT** e RBAC (Admin/Common)
-* **Paginação de dados** e Filtros
-* **Testes de Integração** (InMemory Database)
-* **CI/CD Manual**: Deploy automatizado via Docker Hub e Render.com
+---
 
-## 🚀 Como Rodar (Via Docker - Recomendado)
-Como o projeto agora depende de um banco PostgreSQL, a forma mais fácil de rodar é via Docker, pois ele configura o ambiente todo para você.
+## Tecnologias e Práticas
 
-1. **Clone o repositório** e entre na pasta raiz.
-2. **Crie a imagem:**
-   ```bash
-   docker build -t product-api .
-Rode o container:
+O projeto foi construído focando em desacoplamento, testabilidade e performance.
 
-⚠️ Atenção: Substitua os valores abaixo (senhas e chaves) pelos seus próprios segredos antes de rodar.
+- Framework: .NET 10 (C#)
+- Arquitetura: Clean Architecture (Domain, Application, Infrastructure, API)
+- Banco de Dados: PostgreSQL
+- ORM: Entity Framework Core (Code First)
+- Autenticação: JWT (JSON Web Token)
+- Validação: FluentValidation (Fail Fast Strategy)
+- Mapeamento: AutoMapper
+- Containerização: Docker & Docker Hub
+- Testes: xUnit (Unitários e de Integração)
 
-Bash
+## Estrutura do Projeto
 
-docker run -p 5000:8080 \
-  -e "ASPNETCORE_ENVIRONMENT=Development" \
-  -e "JwtSettings:SecretKey=DefinaUmaChaveSuperSecretaComMuitosCaracteres123!" \
-  -e "AdminSettings:Password=DefinaSuaSenhaDeAdmin" \
-  -e "ConnectionStrings:DefaultConnection=Host=SEU_HOST;Port=5432;Database=SEU_DB;Username=SEU_USER;Password=SUA_SENHA" \
-  product-api
-☁️ Deploy (Produção)
-A API está rodando publicamente no Render.com conectada a um banco PostgreSQL gerenciado.
+A solução segue a separação de responsabilidades estrita:
 
-Documentação (Swagger): /swagger
+- Domain: Entidades, Enums e Regras de Negócio "Puras". Não depende de nenhuma outra camada.
+- Application: Casos de uso (Services), DTOs, Interfaces e Validações.
+- Infrastructure: Implementação de acesso a dados (Repositories), Contexto do Banco e Configurações externas.
+- Api: Controllers, Middlewares e Injeção de Dependência (IoC).
 
-Repositório mantido por Gustavo Meneguelli para fins de estudo.
+## Funcionalidades Principais
+
+- Gestão de Produtos: CRUD completo com relacionamento de categorias.
+- Integridade de Dados: Restrições de chave estrangeira (Delete Restrict) para evitar registros órfãos.
+- Segurança: Hash de senhas e proteção de rotas via Role-based Authorization (Admin/User).
+- Auditoria: Implementação de Soft Delete e rastreamento de data de criação/edição.
+
+## Como Rodar Localmente
+
+### Pré-requisitos
+- .NET SDK 10.0+
+- Docker (Recomendado para o Banco de Dados)
+- PostgreSQL
+
+### Passo a passo
+
+1. Clone o repositório:
+   git clone https://github.com/gustavo-meneguelli/darklyn-tech-store-api.git
+
+2. Configure o Banco de Dados:
+   Atualize a string de conexão no appsettings.Development.json ou utilize o user-secrets para maior segurança.
+
+3. Execute as Migrations:
+   dotnet ef database update
+
+4. Rode a API:
+   dotnet run --project src/Api
+
+   O Swagger estará disponível em http://localhost:5000/swagger (ou na porta configurada).
+
+## Testes
+
+O projeto possui uma suíte de testes automatizados para garantir a estabilidade das regras de negócio e da integração.
+
+Para executar os testes:
+dotnet test
+
+---
+Desenvolvido por Gustavo Meneguelli.
