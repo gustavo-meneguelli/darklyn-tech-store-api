@@ -5,7 +5,7 @@ namespace Application.Interfaces.Services;
 
 public interface ICategoryService
 {
-    Task<Result<IEnumerable<CategoryResponseDto>>> GetAllAsync();
+    Task<Result<PagedResult<CategoryResponseDto>>> GetAllAsync(PaginationParams paginationParams);
     
     Task<Result<CategoryResponseDto>> GetByIdAsync(int id);
     

@@ -21,6 +21,7 @@ public abstract class MainController : ControllerBase
             TypeResult.NotFound => NotFound(new { message = result.Message }),
             TypeResult.Duplicated => Conflict(new { message = result.Message }),
             TypeResult.Unauthorized => Unauthorized(new { message = result.Message }),
+            TypeResult.NoContent => NoContent(),
             
             _ => BadRequest(new { message = result.Message })
         };

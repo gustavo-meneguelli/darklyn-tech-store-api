@@ -6,5 +6,6 @@ public enum TypeResult
     Created,
     Duplicated,
     NotFound,
-    Unauthorized
+    Unauthorized,
+    NoContent
 }
