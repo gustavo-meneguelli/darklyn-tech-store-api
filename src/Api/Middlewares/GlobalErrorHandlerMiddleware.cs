@@ -5,6 +5,7 @@ public class GlobalErrorHandlerMiddleware(
     ILogger<GlobalErrorHandlerMiddleware> logger,
     IWebHostEnvironment environment)
 {
+    // Captura todas as exceções não tratadas da aplicação
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -23,6 +24,7 @@ public class GlobalErrorHandlerMiddleware(
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
+        // Detalhes da exception expostos apenas em Development
         var errorResponse = new
         {
             Status = context.Response.StatusCode,

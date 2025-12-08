@@ -13,43 +13,48 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Product>() //Exibe apenas produtos que não foram deletados
+        // Soft Delete: queries automáticas já filtram registros deletados
+        modelBuilder.Entity<Product>()
             .HasQueryFilter(p => !p.IsDeleted);
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(u => !u.IsDeleted); //Exibe apenas usuários que não foram deletados
+            .HasQueryFilter(u => !u.IsDeleted);
         
         modelBuilder.Entity<Category>()
-            .HasQueryFilter(c => !c.IsDeleted); //Exibe apenas categorias que não foram deletadas
+            .HasQueryFilter(c => !c.IsDeleted);
         
+        // Proteção de integridade: impede deletar categoria com produtos vinculados
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict); //Não deixa deletar categoria se houver produtos relacionado 
+            .OnDelete(DeleteBehavior.Restrict);
     }
     
+    // Intercepta SaveChanges para gerenciar timestamps e soft delete automaticamente
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries<Domain.Common.Entity>();
 
-        //Para cada entidade trackeada será feita uma modificação no seu estado e propriedades
         foreach (var entry in entries)
         {
+            // Novo registro
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
                 entry.Entity.IsDeleted = false;
             }
 
+            // Atualização
             if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
 
+            // Soft Delete: transforma DELETE em UPDATE
             if (entry.State == EntityState.Deleted)
             {
-                entry.State = EntityState.Modified; 
+                entry.State = EntityState.Modified;
             
                 entry.Entity.IsDeleted = true;
                 entry.Entity.UpdatedAt = DateTime.UtcNow;

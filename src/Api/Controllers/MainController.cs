@@ -8,6 +8,7 @@ namespace Api.Controllers;
 [ApiController]
 public abstract class MainController : ControllerBase
 {
+    // Traduz Result Pattern para códigos HTTP apropriados
     protected IActionResult ParseResult<T>(Result<T>? result)
     {
         if (result is null) return BadRequest(new { message = "Operação inválida." });

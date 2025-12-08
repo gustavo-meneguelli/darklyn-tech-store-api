@@ -1,5 +1,6 @@
 namespace Domain.Constants;
 
+// Mensagens de erro centralizadas (usadas com string.Format)
 public static class ErrorMessages
 {
     public const string NotFound = "{0} não foi encontrado(a).";

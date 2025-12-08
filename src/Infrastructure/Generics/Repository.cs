@@ -21,6 +21,7 @@ public class Repository<T>(AppDbContext context) : IRepository<T> where T : clas
         return entity;
     }
 
+    // Update é síncrono no EF Core (apenas marca entidade como modificada)
     public Task UpdateAsync(T entity)
     {
         context.Set<T>().Update(entity);
@@ -53,6 +54,7 @@ public class Repository<T>(AppDbContext context) : IRepository<T> where T : clas
 
         var totalCount = await query.CountAsync();
 
+        // Paginação: calcula offset e aplica limit
         var items = await query
             .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
             .Take(paginationParams.PageSize)

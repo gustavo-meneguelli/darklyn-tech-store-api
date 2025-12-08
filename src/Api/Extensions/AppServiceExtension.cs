@@ -18,6 +18,7 @@ public static class AppServiceExtension
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
+        // Suporta appsettings local e variável de ambiente (Railway/Heroku)
         var connectionString = config.GetConnectionString("DefaultConnection") 
                                ?? config["DATABASE_URL"];
         
@@ -94,6 +95,7 @@ public static class AppServiceExtension
             })
             .AddJwtBearer(x =>
             {
+                // TODO: Habilitar HTTPS em produção
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
@@ -119,6 +121,7 @@ public static class AppServiceExtension
         {
             var dbContext = services.GetRequiredService<AppDbContext>();
 
+            // Aplica migrations automaticamente no startup
             if (dbContext.Database.IsRelational())
             {
                 await dbContext.Database.MigrateAsync(); 

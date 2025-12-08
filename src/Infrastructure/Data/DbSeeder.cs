@@ -11,6 +11,7 @@ public class DbSeeder(IUserRepository userRepository, IPasswordHash passwordHash
 {
     public async Task SeedAsync()
     {
+        // Cria admin apenas se não existir (evita duplicação em restarts)
         var userExists = await userRepository.GetUserByUsernameAsync("admin");
 
         if (userExists is null)

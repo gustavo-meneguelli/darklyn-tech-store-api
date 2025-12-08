@@ -17,6 +17,7 @@ public class ProductService(
 {
     public async Task<Result<PagedResult<ProductResponseDto>>> GetAllAsync(PaginationParams pagination)
     {
+        // Eager loading: carrega Category junto para evitar N+1 queries
         var pagedResult = await productRepository.GetAllAsync(
             pagination,
             filter: null,
@@ -73,6 +74,7 @@ public class ProductService(
             return Result<ProductResponseDto?>.NotFound(string.Format(ErrorMessages.NotFound, "Produto"));
         }
 
+        // Mapper atualiza apenas campos informados (update parcial)
         mapper.Map(dto, product);
         await productRepository.UpdateAsync(product);
         await unitOfWork.CommitAsync();
@@ -93,6 +95,7 @@ public class ProductService(
         await productRepository.DeleteAsync(product);
         await unitOfWork.CommitAsync();
 
+        // DELETE retorna 204 NoContent conforme padrão REST
         return Result<ProductResponseDto?>.NoContent();
     }
 }
