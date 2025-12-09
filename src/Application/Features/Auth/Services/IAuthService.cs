@@ -5,8 +5,8 @@ namespace Application.Features.Auth.Services;
 
 public interface IAuthService
 {
-    public Task<Result<string>> LoginAsync(LoginDto login);
-    public Task<Result<string>> RegisterAsync(UserRegisterDto dto);
+    Task<Result<AuthResponseDto>> LoginAsync(LoginDto login);
+    Task<Result<AuthResponseDto>> RegisterAsync(UserRegisterDto dto);
 }
 
 
