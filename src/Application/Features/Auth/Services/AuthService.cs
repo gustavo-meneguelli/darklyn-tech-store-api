@@ -5,47 +5,53 @@ using Application.Features.Auth.Repositories;
 using Domain.Constants;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 
 namespace Application.Features.Auth.Services;
 
 public class AuthService(IUserRepository userRepository, IPasswordHash passwordHash, ITokenService tokenService, IUnitOfWork unitOfWork)
     : IAuthService
 {
-    public async Task<Result<string>> LoginAsync(LoginDto dto)
+    public async Task<Result<AuthResponseDto>> LoginAsync(LoginDto dto)
     {
         var user = await userRepository.GetUserByUsernameAsync(dto.Username);
 
         if (user is null)
         {
-            return Result<string>.Unauthorized(string.Format(ErrorMessages.CredentialsInvalid));
+            return Result<AuthResponseDto>.Unauthorized(ErrorMessages.InvalidCredentials);
         }
 
         var passwordIsValid = passwordHash.VerifyHashedPassword(dto.Password, user.PasswordHash);
 
         if (!passwordIsValid)
         {
-            return Result<string>.Unauthorized(string.Format(ErrorMessages.CredentialsInvalid));
+            return Result<AuthResponseDto>.Unauthorized(ErrorMessages.InvalidCredentials);
         }
 
-        var token = tokenService.GenerateToken(user);
+        var authResponse = tokenService.GenerateAuthResponse(user);
 
-        return Result<string>.Success(token);
+        return Result<AuthResponseDto>.Success(authResponse);
     }
 
-    public async Task<Result<string>> RegisterAsync(UserRegisterDto dto)
+    public async Task<Result<AuthResponseDto>> RegisterAsync(UserRegisterDto dto)
     {
         var user = new User
         {
             Username = dto.Username,
             PasswordHash = passwordHash.HashPassword(dto.Password),
-            Role = UserRole.Common
+            Role = UserRole.Common,
+            FirstName = dto.FirstName.Capitalize(),
+            LastName = dto.LastName.Capitalize(),
+            AvatarChoice = dto.AvatarChoice
         };
 
         await userRepository.AddAsync(user);
 
         await unitOfWork.CommitAsync();
 
-        return Result<string>.Success("Usuário criado com sucesso");
+        var authResponse = tokenService.GenerateAuthResponse(user);
+
+        return Result<AuthResponseDto>.Success(authResponse);
     }
 }
 

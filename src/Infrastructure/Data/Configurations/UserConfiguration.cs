@@ -23,8 +23,27 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Property(u => u.Role)
+            .IsRequired();
+
+        // Campos de perfil
+        builder.Property(u => u.FirstName)
             .IsRequired()
-            .HasConversion<string>();
+            .HasMaxLength(50);
+
+        builder.Property(u => u.LastName)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(u => u.AvatarChoice)
+            .IsRequired();
+
+        builder.Property(u => u.HasCompletedFirstPurchaseReview)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        // Propriedades calculadas - não mapeadas para o banco
+        builder.Ignore(u => u.FullName);
+        builder.Ignore(u => u.Initials);
 
         // Soft Delete QueryFilter
         builder.HasQueryFilter(u => !u.IsDeleted);
@@ -40,3 +59,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(false);
     }
 }
+
+
