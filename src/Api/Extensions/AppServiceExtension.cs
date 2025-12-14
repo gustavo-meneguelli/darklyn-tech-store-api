@@ -1,50 +1,13 @@
-using Application.Common.Interfaces;
-using Application.Features.Auth.Repositories;
-using Application.Features.Auth.Services;
-using Application.Features.Categories.Repositories;
-using Application.Features.Categories.Services;
-using Application.Features.Products.Repositories;
-using Application.Features.Products.Services;
 using Infrastructure.Data;
-using Infrastructure.Generics;
-using Infrastructure.Repositories;
-using Infrastructure.Services.Auth;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace Api.Extensions;
 
 public static class AppServiceExtension
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
-    {
-        // Suporta appsettings local e variável de ambiente (Railway/Heroku)
-        var connectionString = config.GetConnectionString("DefaultConnection")
-                               ?? config["DATABASE_URL"];
-
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            throw new InvalidOperationException("Connection string not found. Checked 'DefaultConnection' and 'DATABASE_URL'.");
-        }
-
-        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
-
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IPasswordHash, PasswordHash>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<DbSeeder>();
-        services.AddScoped<DevelopmentSeeder>();
-
-        return services;
-    }
+    // Método AddApplicationServices removido para evitar recursão e ambiguidade.
+    // A chamada agora é feita diretamente no Program.cs para as camadas Application e Infrastructure.
 
     public static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
@@ -83,36 +46,7 @@ public static class AppServiceExtension
         return services;
     }
 
-    public static IServiceCollection AddJwtConfig(this IServiceCollection services, IConfiguration config)
-    {
-        var secretKey = config["JwtSettings:SecretKey"]
-                        ?? throw new InvalidOperationException("JwtSettings:SecretKey is null");
 
-        var keyBytes = System.Text.Encoding.UTF8.GetBytes(secretKey);
-        var key = new SymmetricSecurityKey(keyBytes);
-
-        services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                // TODO: Habilitar HTTPS em produção
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = key,
-                    ValidateLifetime = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-
-        return services;
-    }
 
     public static async Task UseDbSeeder(this WebApplication app)
     {
@@ -134,12 +68,6 @@ public static class AppServiceExtension
             var seeder = services.GetRequiredService<DbSeeder>();
             await seeder.SeedAsync();
 
-            // Seed de desenvolvimento (APENAS em ambiente Development)
-            if (app.Environment.IsDevelopment())
-            {
-                var devSeeder = services.GetRequiredService<DevelopmentSeeder>();
-                await devSeeder.SeedAsync();
-            }
         }
         catch (Exception ex)
         {

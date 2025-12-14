@@ -1,6 +1,6 @@
 using Api.Extensions;
-using Application.Features.Products.Validators;
-using FluentValidation;
+using Application.Extensions;
+using Infrastructure.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,13 +20,22 @@ builder.Host.UseSerilog((context, configuration) =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddSwaggerConfig();
-builder.Services.AddJwtConfig(builder.Configuration);
+// Cache em memória para dados que mudam raramente (ex: categorias)
+builder.Services.AddMemoryCache();
 
-// FluentValidation, AutoMapper
-builder.Services.AddValidatorsFromAssemblyContaining<CreateProductDtoValidator>();
-builder.Services.AddAutoMapper(typeof(Application.Common.Mappings.MappingProfile));
+
+
+// ...
+
+// Registro Direto das Camadas
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddSwaggerConfig();
+// builder.Services.AddJwtConfig Removido (agora dentro de Infrastructure)
+
+// FluentValidation e AutoMapper agora são registrados em Application layer
+// builder.Services.AddValidatorsFromAssemblyContaining... Removido
+// builder.Services.AddAutoMapper... Removido
 
 builder.Services.AddCorsConfig(builder.Configuration);
 
@@ -48,6 +57,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Health Check endpoint para Docker/Kubernetes
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+    .WithTags("Health")
+    .AllowAnonymous();
 
 //Check Seeder
 await app.UseDbSeeder();

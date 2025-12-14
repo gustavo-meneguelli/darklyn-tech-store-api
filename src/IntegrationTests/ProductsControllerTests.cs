@@ -23,9 +23,9 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
 
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/Login", loginDto);
 
-        var responseContent = await loginResponse.Content.ReadAsStringAsync();
+        var authResponse = await loginResponse.Content.ReadFromJsonAsync<AuthResponseDto>();
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseContent);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResponse!.Token);
     }
 
     [Fact]
@@ -47,14 +47,21 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
         // 1. ARRANGE
         await Authenticate();
 
-        var newCategory = new CreateCategoryDto { Name = "Tech" };
+        var newCategory = new CreateCategoryDto { Name = $"Tech-{Guid.NewGuid()}" };
         var categoryResponse = await _client.PostAsJsonAsync("/api/categories", newCategory);
+        categoryResponse.EnsureSuccessStatusCode(); // Fail if category creation failed
+
+        var createdCategory = await categoryResponse.Content.ReadFromJsonAsync<Category>();
+        Assert.NotNull(createdCategory);
+        var categoryId = createdCategory.Id;
 
         var newProduct = new CreateProductDto
         {
             Name = "Teclado Mecânico",
+            Description = "Teclado mecânico RGB com switches Cherry MX",
+            ImageUrl = "https://example.com/teclado.jpg",
             Price = 150.00m,
-            CategoryId = 1
+            CategoryId = categoryId // Use dynamic ID
         };
 
         // 2. ACT 
@@ -75,11 +82,20 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
         // 1. ARRANGE
         await Authenticate();
 
-        var newCategory = new CreateCategoryDto { Name = "Tech" };
+        var newCategory = new CreateCategoryDto { Name = $"Tech-{Guid.NewGuid()}" };
         var categoryResponse = await _client.PostAsJsonAsync("/api/categories", newCategory);
+        categoryResponse.EnsureSuccessStatusCode();
+        var createdCategory = await categoryResponse.Content.ReadFromJsonAsync<Category>();
 
         // Cria o primeiro
-        var product1 = new CreateProductDto { Name = "Duplicado", Price = 100, CategoryId = 1 };
+        var product1 = new CreateProductDto 
+        { 
+            Name = "Duplicado", 
+            Description = "Produto duplicado para teste de validação",
+            ImageUrl = "https://example.com/duplicado.jpg",
+            Price = 100, 
+            CategoryId = createdCategory!.Id 
+        };
         await _client.PostAsJsonAsync("/api/products", product1);
 
         // 2. ACT - Tenta criar de novo
@@ -90,6 +106,6 @@ public class ProductsControllerTests(CustomWebApplicationFactory<Program> factor
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Assert.Contains("Já existe um registro", content, StringComparison.InvariantCultureIgnoreCase);
+        Assert.Contains("already exists", content, StringComparison.InvariantCultureIgnoreCase);
     }
 }
