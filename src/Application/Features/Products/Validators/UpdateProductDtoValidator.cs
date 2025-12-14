@@ -10,44 +10,49 @@ public class UpdateProductDtoValidator : AbstractValidator<UpdateProductDto>
 {
     public UpdateProductDtoValidator(IProductRepository productRepository, ICategoryRepository categoryRepository)
     {
-        // Update parcial: nome vazio = não atualizar este campo
-        RuleFor(p => p.Name)
-            .MinimumLength(3).WithMessage("O nome deve ter no mínimo 3 caracteres.")
-            .MaximumLength(50).WithMessage("O nome deve ter no máximo 50 caracteres.")
-            .When(p => p.Name != string.Empty);
-
-        // Verifica unicidade apenas se informado um nome novo
+        // Validação de Name: update parcial, só valida se informado
         RuleFor(p => p.Name)
             .Cascade(CascadeMode.Stop)
+            .MinimumLength(3).WithMessage(string.Format(ErrorMessages.MinLength, "name", 3))
+            .MaximumLength(50).WithMessage(string.Format(ErrorMessages.MaxLength, "name", 50))
             .MustAsync(async (name, _) =>
             {
                 bool exists = await productRepository.ExistByNameAsync(name);
                 return !exists;
             })
-            .WithMessage(string.Format(ErrorMessages.AlreadyExists, "produto", "nome"))
+            .WithMessage(string.Format(ErrorMessages.AlreadyExists, "product", "name"))
             .When(p => p.Name != string.Empty);
 
-        // Update parcial: preço zero = não atualizar este campo
+        // Validação de Price: update parcial, só valida se informado
         RuleFor(p => p.Price)
-            .GreaterThan(0).WithMessage("O preço deve ser maior que zero.")
-            .LessThan(100000).WithMessage("O preço deve ser menor que R$ 100.000,00")
+            .GreaterThan(0).WithMessage(string.Format(ErrorMessages.GreaterThanZero, "price"))
+            .LessThan(100000).WithMessage(string.Format(ErrorMessages.MaxValue, "price", 100000))
             .When(p => p.Price != 0);
 
-        // Update parcial: categoryId zero = não atualizar este campo
-        RuleFor(p => p.CategoryId)
-            .GreaterThan(0).WithMessage("ID da categoria inválido.")
-            .When(p => p.CategoryId != 0);
-
-        // Verifica se categoria existe apenas quando informada
+        // Validação de CategoryId: update parcial, só valida se informado
         RuleFor(p => p.CategoryId)
             .Cascade(CascadeMode.Stop)
+            .GreaterThan(0).WithMessage(string.Format(ErrorMessages.InvalidId, "category"))
             .MustAsync(async (id, _) =>
             {
                 var category = await categoryRepository.GetByIdAsync(id);
                 return category is not null;
             })
-            .WithMessage(string.Format(ErrorMessages.NotFound, "Categoria"))
+            .WithMessage(ErrorMessages.CategoryNotFound)
             .When(p => p.CategoryId != 0);
+
+        // Validação de Description: update parcial, só valida se informado
+        RuleFor(p => p.Description)
+            .MinimumLength(10).WithMessage(string.Format(ErrorMessages.MinLength, "description", 10))
+            .MaximumLength(2000).WithMessage(string.Format(ErrorMessages.MaxLength, "description", 2000))
+            .When(p => p.Description != string.Empty);
+
+        // Validação de ImageUrl: update parcial, só valida se informado
+        RuleFor(p => p.ImageUrl)
+            .MaximumLength(500).WithMessage(string.Format(ErrorMessages.MaxLength, "image URL", 500))
+            .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
+            .WithMessage(string.Format(ErrorMessages.InvalidUrl, "image URL"))
+            .When(p => p.ImageUrl != string.Empty);
     }
 }
 
